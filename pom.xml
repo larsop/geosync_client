@@ -1,0 +1,198 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>no.skogoglandskap</groupId>
+	<artifactId>geosync_client</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>geosync_client</name>
+
+	<packaging>war</packaging>
+
+	<properties>
+		<axis2.version>1.6.2</axis2.version>
+		<spring.ws.core.version>2.1.4.RELEASE</spring.ws.core.version>
+		<spring.version>3.2.3.RELEASE</spring.version>
+		<geotools.version>10-RC1</geotools.version>
+		<gt-opengis.version>2.7.4</gt-opengis.version>
+
+		<jts.version>1.13</jts.version>
+
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>no.skogoglandskap</groupId>
+			<artifactId>geosync_base</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- jUnit test framework -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- test framework -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<repositories>
+
+		<repository>
+			<id>jboss-public</id>
+			<name>JBoss Public Nexus Repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+		</repository>
+
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net repository</name>
+			<url>http://download.java.net/maven/2</url>
+		</repository>
+		<repository>
+			<id>osgeo</id>
+			<name>Open Source Geospatial Foundation Repository</name>
+			<url>http://download.osgeo.org/webdav/geotools/</url>
+		</repository>
+		<repository>
+			<id>opengeo</id>
+			<name>OpenGeo Maven Repository</name>
+			<url>http://repo.opengeo.org</url>
+		</repository>
+
+		<repository>
+			<id>maven2-repository.dev.java.repositorynet</id>
+			<name>Java.net Maven 2 Repository</name>
+			<url>http://download.java.net/maven/2</url>
+		</repository>
+
+		<repository>
+			<id>Hibernate Spatial repo</id>
+			<url>http://www.hibernatespatial.org/repository</url>
+		</repository>
+
+	</repositories>
+
+	<build>
+		<finalName>geosync_client_ws_01</finalName>
+
+		<plugins>
+
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<!-- <generatedSourcesDirectory>${project.build.directory}/generated-sources/</generatedSourcesDirectory> -->
+				</configuration>
+
+			</plugin>
+			<plugin>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
+				<version>${axis2.version}</version>
+				<executions>
+					<execution>
+						<id>ws5</id>
+						<goals>
+							<goal>wsdl2code</goal>
+						</goals>
+						<configuration>
+							<wsdlFile>http://www.geosynkronisering.no/files/skjema/1.0/geosyncreplication.wsdl</wsdlFile>
+							<databindingName>xmlbeans</databindingName>
+							<packageName>org.apache.xmlbeans</packageName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- here the phase you need -->
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/xsd</directory>
+									<!-- <filtering>true</filtering> -->
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<!-- this tells maven to copy the openejb-javaagent jar into your target/ 
+				directory -->
+			<!-- where surefire can see it -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.apache.openejb</groupId>
+									<artifactId>openejb-javaagent</artifactId>
+									<version>3.0-beta-2</version>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+				</configuration>
+			</plugin>
+
+		</plugins>
+		<resources>
+			<resource>
+				<directory>target/generated-sources/axis2/wsdl2code/resources</directory>
+			</resource>
+			<resource>
+				<directory>target/generated-sources/xmlbeans/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+
+	</build>
+</project>
+
