@@ -18,6 +18,7 @@
 		<gt-opengis.version>2.7.4</gt-opengis.version>
 
 		<jts.version>1.13</jts.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 	</properties>
 
@@ -96,7 +97,7 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
-					<!-- <generatedSourcesDirectory>${project.build.directory}/generated-sources/</generatedSourcesDirectory> -->
+  					<encoding>${project.build.sourceEncoding}</encoding>                    
 				</configuration>
 
 			</plugin>
