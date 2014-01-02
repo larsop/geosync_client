@@ -52,5 +52,4 @@ public class GeosynkroniseringImpl implements GeosynkroniseringInterface {
 
 	}
 
-
 }
