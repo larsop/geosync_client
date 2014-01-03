@@ -68,8 +68,6 @@ public class GeosynkroniseringImpl implements GeosynkroniseringInterface {
 		GetLastIndexResponse getLastIndexResponse = lastIndex.getGetLastIndexResponse();
 
 		BigInteger return1 = getLastIndexResponse.getReturn();
-		
-		System.out.println("getLastIndex " + return1 );
 
 		return return1;
 
@@ -88,8 +86,6 @@ public class GeosynkroniseringImpl implements GeosynkroniseringInterface {
 		GetChangelogStatusResponse 	getChangelogStatusResponse = status.getGetChangelogStatusResponse();
 
 		Enum returnStatus = getChangelogStatusResponse.getReturn();
-		
-		System.out.println("getChangelogStatus " + returnStatus );
 
 		return returnStatus;
 	}
@@ -118,8 +114,6 @@ public class GeosynkroniseringImpl implements GeosynkroniseringInterface {
 		GetChangelogResponse 	getChangelogResponse = changelog.getGetChangelogResponse();
 
 		ChangelogType returnChangelog = getChangelogResponse.getReturn();
-		
-		System.out.println("getChangelog downloadURI " + returnChangelog.getDownloadUri() );
 
 		return returnChangelog;
 	}
@@ -137,8 +131,6 @@ public class GeosynkroniseringImpl implements GeosynkroniseringInterface {
 		ListStoredChangelogsResponse listStoredChangelogResponse = listStoredChangelog.getListStoredChangelogsResponse();
 
 		StoredChangelogListe returnListStoredChangelog = listStoredChangelogResponse.getReturn();
-		
-		System.out.println("listStoredChangelog size " + returnListStoredChangelog.getStoredchangelogArray().length);
 
 		return returnListStoredChangelog;
 	}
@@ -156,8 +148,6 @@ public class GeosynkroniseringImpl implements GeosynkroniseringInterface {
 		OrderChangelogResponse orderChangelogResponse = orderChangelog.getOrderChangelogResponse();
 
 		ChangelogIdentificationType returnOrderChangelog = orderChangelogResponse.getReturn();
-		
-		System.out.println("orderChangelog changelogId " + returnOrderChangelog.getChangelogId() );
 
 		return returnOrderChangelog;
 		

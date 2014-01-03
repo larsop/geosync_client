@@ -3,12 +3,19 @@ package no.geonorge.skjema.sosi.produktspesifikasjon.geosynkronisering;
 
 import java.math.BigInteger;
 import java.rmi.RemoteException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.xmlbeans.ServiceExceptionReportMessage;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import no.geonorge.skjema.sosi.produktspesifikasjon.geosynkronisering.GeosynkroniseringInterface;
 import no.geonorge.skjema.standard.geosynkronisering._1_0.produkt.ChangelogIdentificationType;
 import no.geonorge.skjema.standard.geosynkronisering._1_0.produkt.ChangelogOrderType;
@@ -24,18 +31,19 @@ import no.geonorge.skjema.standard.geosynkronisering._1_0.produkt.StoredChangelo
 public class GeosynkroniseringController {
 	
 	GeosynkroniseringInterface geosynkroniseringImpl;
+	
 	//default settings
-	String datasetId = "AR5";
 	String changelogId = "0";
 	String startIndex = "0";
 	String count = "1000";
 	String ResultType = "results";
 	String outputFormat = "application/gml+xml; version=3.2";
 	
+	List<String> logList = Collections.synchronizedList(new ArrayList<String>());
+	
 	
 	@RequestMapping(value="/start", method = RequestMethod.GET)
 	public String startUttak(ModelMap model) {
-		model.addAttribute("datasetId", datasetId);
 		model.addAttribute("changelogId", changelogId);
 		model.addAttribute("startIndex", startIndex);
 		model.addAttribute("count", count);
@@ -46,22 +54,28 @@ public class GeosynkroniseringController {
 	}
 	
 	@RequestMapping(value="/getLastIndex", method = RequestMethod.GET)
-	public String getLastIndex(ModelMap model) throws RemoteException, ServiceExceptionReportMessage {
+	public String getLastIndex(ModelMap model, @RequestParam("datasetId") String datasetId) throws RemoteException, ServiceExceptionReportMessage {
+		Date date = new Date();
+		String logDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date);
+		
 		geosynkroniseringImpl = GeosynkroniseringFactory.getGeosynkronisering();
 		BigInteger getLastIndex = geosynkroniseringImpl.GetLastIndex(datasetId);
 		
-		model.addAttribute("datasetId", datasetId);
 		model.addAttribute("changelogId", changelogId);
 		model.addAttribute("startIndex", startIndex);
 		model.addAttribute("count", count);
 		model.addAttribute("ResultType", ResultType);
 		model.addAttribute("outputFormat", outputFormat);
-		model.addAttribute("lastIndex", "LastIndex "+ getLastIndex);
+		logList.add(logDate + " getLastIndex, LastIndex "+ getLastIndex);
+		model.addAttribute("lastIndex", logList);	
 		return "index";
  
 	}
 	@RequestMapping(value="/ListStoredChangelogs", method = RequestMethod.GET)
-	public String listStoredChangelogs(ModelMap model) throws RemoteException, ServiceExceptionReportMessage {
+	public String listStoredChangelogs(ModelMap model, @RequestParam("datasetId") String datasetId) throws RemoteException, ServiceExceptionReportMessage {
+		Date date = new Date();
+		String logDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date);
+		
 		geosynkroniseringImpl = GeosynkroniseringFactory.getGeosynkronisering();
 		StoredChangelogListe storedChangelogListe = geosynkroniseringImpl.ListStoredChangelogs(datasetId);
 		
@@ -71,61 +85,75 @@ public class GeosynkroniseringController {
 					+ type.getId().getChangelogId() ;//type.getOrder()
 		}
 		
-		model.addAttribute("datasetId", datasetId);
 		model.addAttribute("changelogId", changelogId);
 		model.addAttribute("startIndex", startIndex);
 		model.addAttribute("count", count);
 		model.addAttribute("ResultType", ResultType);
 		model.addAttribute("outputFormat", outputFormat);
-		model.addAttribute("lastIndex", "storedChangelogList element 0 with end index "+ storedChangelogListe.getStoredchangelogArray(0).getName());
+		logList.add(logDate + " ListStoredChangelogs, " + storedChangelogListText);
+		model.addAttribute("lastIndex", logList);
 		return "index";
  
 	}
 	@RequestMapping(value="/cancelChangelog", method = RequestMethod.GET)
-	public String cancelChangelog(ModelMap model) throws RemoteException, ServiceExceptionReportMessage {
+	public String cancelChangelog(ModelMap model, @RequestParam("changelogId") String changelogId) throws RemoteException, ServiceExceptionReportMessage {
+		Date date = new Date();
+		String logDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date);
+		
 		geosynkroniseringImpl = GeosynkroniseringFactory.getGeosynkronisering();
 		ChangelogIdentificationType changelogId2 = ChangelogIdentificationType.Factory.newInstance();
 		BigInteger changelogIdInt = new BigInteger(changelogId);
 		changelogId2.setChangelogId(changelogIdInt);
 		geosynkroniseringImpl.CancelChangelog(changelogId2);
 		
-		model.addAttribute("datasetId", datasetId);
 		model.addAttribute("changelogId", changelogId);
 		model.addAttribute("startIndex", startIndex);
 		model.addAttribute("count", count);
 		model.addAttribute("ResultType", ResultType);
 		model.addAttribute("outputFormat", outputFormat);
-		model.addAttribute("lastIndex","Changelog " + changelogId2.getChangelogId() + " cancelled");
+		logList.add(logDate + " cancelChangelog, Changelog " + changelogId2.getChangelogId() + " cancelled");
+		model.addAttribute("lastIndex",logList);
 		return "index";
  
 	}
 	
 	@RequestMapping(value="/getChangelogStatus", method = RequestMethod.GET)
-	public String getChangelogStatus(ModelMap model) throws RemoteException, ServiceExceptionReportMessage {
+	public String getChangelogStatus(ModelMap model, @RequestParam("changelogId") String changelogId) throws RemoteException, ServiceExceptionReportMessage {
+		Date date = new Date();
+		String logDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date);
+		
 		geosynkroniseringImpl = GeosynkroniseringFactory.getGeosynkronisering();
 		ChangelogIdentificationType changelogId2 = ChangelogIdentificationType.Factory.newInstance();
 		BigInteger changelogIdInt = new BigInteger(changelogId);
 		changelogId2.setChangelogId(changelogIdInt);
 		Enum getChangelogStatus = geosynkroniseringImpl.GetChangelogStatus(changelogId2);
 		
-		model.addAttribute("datasetId", datasetId);
 		model.addAttribute("changelogId", changelogId);
 		model.addAttribute("startIndex", startIndex);
 		model.addAttribute("count", count);
 		model.addAttribute("ResultType", ResultType);
 		model.addAttribute("outputFormat", outputFormat);
-		model.addAttribute("lastIndex","status " + getChangelogStatus);
+		logList.add(logDate + " getChangelogStatus, status " + getChangelogStatus);
+		model.addAttribute("lastIndex",logList);
 		return "index";
  
 	}
 	
 	@RequestMapping(value="/orderChangelog", method = RequestMethod.GET)
-	public String orderChangelog(ModelMap model) throws RemoteException, ServiceExceptionReportMessage {
+	public String orderChangelog(ModelMap model, @RequestParam("datasetId") String datasetId,
+				@RequestParam("startIndex") String startIndex,
+				@RequestParam("count") String count,
+				@RequestParam("ResultType") String ResultType,
+				@RequestParam("outputFormat") String outputFormat) throws RemoteException, ServiceExceptionReportMessage {
+		Date date = new Date();
+		String logDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date);
+		
 		geosynkroniseringImpl = GeosynkroniseringFactory.getGeosynkronisering();
 		ChangelogOrderType orderType = ChangelogOrderType.Factory.newInstance();
 		BigInteger startIndexInt = new BigInteger(startIndex);
 		BigInteger countInt = new BigInteger(count);
 		net.opengis.www.wfs._2_0.ResultTypeType.Enum resultTypeEnum = net.opengis.www.wfs._2_0.ResultTypeType.Enum.forString(ResultType);
+		
 		orderType.setDatasetId(datasetId);
 		orderType.setStartIndex(startIndexInt);
 		orderType.setCount(countInt);
@@ -134,32 +162,35 @@ public class GeosynkroniseringController {
 		
 		ChangelogIdentificationType order = geosynkroniseringImpl.OrderChangelog(orderType);
 		
-		model.addAttribute("datasetId", datasetId);
 		model.addAttribute("changelogId", changelogId);
 		model.addAttribute("startIndex", startIndex);
 		model.addAttribute("count", count);
 		model.addAttribute("ResultType", ResultType);
 		model.addAttribute("outputFormat", outputFormat);
-		model.addAttribute("lastIndex","order with changelogId " + order.getChangelogId());
+		logList.add(logDate + " orderChangelog, order with changelogId " + order.getChangelogId());
+		model.addAttribute("lastIndex",logList);
 		return "index";
  
 	}
 	
 	@RequestMapping(value="/getChangelog", method = RequestMethod.GET)
-	public String getChangelog(ModelMap model) throws RemoteException, ServiceExceptionReportMessage {
+	public String getChangelog(ModelMap model, @RequestParam("changelogId") String changelogId) throws RemoteException, ServiceExceptionReportMessage {
+		Date date = new Date();
+		String logDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date);
+		
 		geosynkroniseringImpl = GeosynkroniseringFactory.getGeosynkronisering();
 		ChangelogIdentificationType changelogId2 = ChangelogIdentificationType.Factory.newInstance();
 		BigInteger changelogIdInt = new BigInteger(changelogId);
 		changelogId2.setChangelogId(changelogIdInt);
 		ChangelogType getChangelog = geosynkroniseringImpl.GetChangelog(changelogId2);
 		
-		model.addAttribute("datasetId", datasetId);
 		model.addAttribute("changelogId", changelogId);
 		model.addAttribute("startIndex", startIndex);
 		model.addAttribute("count", count);
 		model.addAttribute("ResultType", ResultType);
 		model.addAttribute("outputFormat", outputFormat);
-		model.addAttribute("lastIndex","End index "+getChangelog.getEndIndex() + "<br> DownloadURI " + getChangelog.getDownloadUri() + "<br> changelogId " + changelogId);// + getChangelog.getId().getChangelogId());
+		logList.add(logDate + " getChangelog, End index "+getChangelog.getEndIndex() + "<br> DownloadURI " + getChangelog.getDownloadUri() + "<br> changelogId " + changelogId);
+		model.addAttribute("lastIndex",logList);
 		return "index";
  
 	}
