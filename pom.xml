@@ -38,6 +38,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+ 	 		<groupId>javax.servlet</groupId>
+ 	 		<artifactId>jstl</artifactId>
+  			<version>1.2</version>
+  			<scope>runtime</scope>
+		</dependency>
 		<!-- test framework -->
 		<dependency>
 			<groupId>org.springframework</groupId>
